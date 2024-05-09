@@ -22,7 +22,7 @@ echo "Running cPanel Mail Status Probe"
 
 sleep 1
 
-/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --conf --rbl --all --verbose --rude --queue --maillog
+/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --conf --rbl --all --verbose --queue --maillog
 
  read -p "Would you also like to check the domains? (y|n)" answer
 
