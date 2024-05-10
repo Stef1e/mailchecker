@@ -36,6 +36,8 @@ case $answer in
         done
         ;;
     no|n)
+        echo -e "${RED}Exiting script...${NC}"
+        sleep 0.25
         exit 0
         ;;
 esac
