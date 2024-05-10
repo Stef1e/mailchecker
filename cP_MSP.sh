@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Script Name: cPanel Mail Check
+# Author: Stef1e
+# Created: May 9thth 2024
+# Modified: May 10th 2024
+# Version: 1.0.1
+
+#This script utilized the cPanel Mail Status Probe perl script.
+#More information can be found at the official Github page below:
+#https://github.com/CpanelInc/tech-MSP
+
 # Define text colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
