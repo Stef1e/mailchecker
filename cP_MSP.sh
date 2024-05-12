@@ -26,7 +26,7 @@ echo "Running cPanel Mail Status Probe"
 
 sleep 1
 
-#/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --rotated --conf --verbose --rbl --all --queue --maillog
+/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --rotated --conf --verbose --rbl --all --queue --maillog
 
 #Function to check cPanel domains
 cp_domains() {
