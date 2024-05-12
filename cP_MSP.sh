@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script Name: cPanel Mail Check
-# Author: Stef1e
+# Author: Steven Fleming
 # Created: May 9thth 2024
 # Modified: May 10th 2024
 # Version: 1.0.1
@@ -9,6 +9,7 @@
 #This script utilized the cPanel Mail Status Probe perl script.
 #More information can be found at the official Github page below:
 #https://github.com/CpanelInc/tech-MSP
+
 
 # Define text colors
 RED='\033[0;31m'
@@ -25,29 +26,39 @@ echo "Running cPanel Mail Status Probe"
 
 sleep 1
 
-/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --conf --rbl --all --verbose --rude --queue --maillog
+#/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --rotated --conf --verbose --rbl --all --queue --maillog
 
-echo -e "${GREEN}Domains detected!${NC}"
+#Function to check cPanel domains
+cp_domains() {
+    echo -e "${GREEN}\e[4mDomains detected!\e[0m${NC}"
+    echo " "
+    sleep 0.25
 
-sleep 0.5
+    whmapi1 listaccts | grep domain | awk '{print $2}'
 
-whmapi1 listaccts | grep domain | awk '{print $2}'
+    sleep 0.25
+    echo " "
+    read -p "Would you like to check the domains? (y|n):" answer
 
-sleep 0.5
+    case $answer in
+        yes|y)
+            for accts in $(whmapi1 listaccts | grep domain | awk '{print $2}'); do
+                echo "_______________________________________________________________________________________"
+                /usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --domain="$accts";
+                echo "_______________________________________________________________________________________"
+            done
+            ;;
+        no|n)
+            echo -e "${RED}Exiting script...${NC}"
+            sleep 0.25
+            exit 0
+            ;;
+    esac
+}
 
-read -p "Would you like to check the domains? (y|n):" answer
-
-case $answer in
-    yes|y)
-        for accts in $(whmapi1 listaccts | grep domain | awk '{print $2}'); do
-        echo "_______________________________________________________________________________________"
-            /usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --domain="$accts";
-        echo "_______________________________________________________________________________________"
-        done
-        ;;
-    no|n)
-        echo -e "${RED}Exiting script...${NC}"
-        sleep 0.25
-        exit 0
-        ;;
-esac
+#Checks if cPanel domains are present, then will run the function
+if [ -n "$(whmapi1 listaccts | grep domain)" ]; then
+    cp_domains
+else
+    exit 0
+fi
