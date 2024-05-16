@@ -26,7 +26,24 @@ echo "Running cPanel Mail Status Probe"
 
 sleep 1
 
-/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --rotated --conf --verbose --rbl --all --queue --maillog
+/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --auth --rotated --conf --verbose --rbl --all --maillog
+
+#Function to clear Exim Queue
+exim_queue() {
+        queue_output=$(/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --queue)
+        queue_count=$(echo "$queue_output" | grep 'Exim Queue:' | awk '{print $3}')
+        if (( queue_count > 10 )); then
+                read -p "The Exim queue has more than 10 frozen emails. Would you like to clear it? (y/n):  " user_input
+
+                if [[ "$user_input" == "yes" ]]; then
+                        exim -bp | grep frozen | awk '{print $3}' | xargs exim -Mrm
+                        echo "${GREEN}Frozen mail queue cleared!${NC}"
+                else
+                        echo "Mail queue left intact"
+                fi
+        fi
+}
+
 
 #Function to check cPanel domains
 cp_domains() {
@@ -55,6 +72,9 @@ cp_domains() {
             ;;
     esac
 }
+
+#Runs exim queue function
+exim_queue
 
 #Checks if cPanel domains are present, then will run the function
 if [ -n "$(whmapi1 listaccts | grep domain)" ]; then
