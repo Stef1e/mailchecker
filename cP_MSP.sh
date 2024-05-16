@@ -3,7 +3,7 @@
 # Script Name: cPanel Mail Check
 # Author: Steven Fleming
 # Created: May 9thth 2024
-# Modified: May 10th 2024
+# Modified: May 16th 2024
 # Version: 1.0.1
 
 #This script utilized the cPanel Mail Status Probe perl script.
