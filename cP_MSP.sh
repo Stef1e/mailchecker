@@ -3,7 +3,7 @@
 # Script Name: cPanel Mail Check
 # Author: Steven Fleming
 # Created: May 9thth 2024
-# Modified: May 16th 2024
+# Modified: May 23rd 2024
 # Version: 1.0.1
 
 #This script utilized the cPanel Mail Status Probe perl script.
@@ -30,18 +30,20 @@ sleep 1
 
 #Function to clear Exim Queue
 exim_queue() {
-        queue_output=$(/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --queue)
-        queue_count=$(echo "$queue_output" | grep 'Exim Queue:' | awk '{print $3}')
-        if (( queue_count > 10 )); then
-                read -p "The Exim queue has more than 10 frozen emails. Would you like to clear it? (y/n):  " user_input
+#    queue_output=$(/usr/local/cpanel/3rdparty/bin/perl <(curl -s "https://raw.githubusercontent.com/CpanelInc/tech-SSE/master/msp.pl") --queue)
+    queue_count=$(exim -bpc)
+    echo -e "Exim Queue Count: " "${RED}\e[4m$queue_count\e[0m${NC}"
 
-                if [[ "$user_input" == "yes" ]]; then
-                        exim -bp | grep frozen | awk '{print $3}' | xargs exim -Mrm
-                        echo "${GREEN}Frozen mail queue cleared!${NC}"
-                else
-                        echo "Mail queue left intact"
-                fi
+    if (( queue_count > 10 )); then
+        read -p "The Exim queue has more than 10 frozen emails. Would you like to clear it? (y/n): " user_input
+
+        if [[ "$user_input" == "y" || "$user_input" == "yes" ]]; then
+            exim -bp | grep frozen | awk '{print $3}' | xargs exim -Mrm > /dev/null
+            echo "${GREEN}Frozen mail queue cleared!${NC}"
+        else
+            echo "Mail queue left intact"
         fi
+    fi
 }
 
 
